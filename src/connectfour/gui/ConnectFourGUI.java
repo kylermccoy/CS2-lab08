@@ -54,6 +54,12 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
         // TODO
     }
 
+    /**
+     * Do your GUI updates here.
+     */
+    private void refresh() {
+        // TODO
+    }
 
     /**
      * Called by the model, client.ConnectFourBoard, whenever there is a state change
@@ -63,7 +69,12 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
      */
     @Override
     public void update(ConnectFourBoard connectFourBoard) {
-        // TODO
+        if ( Platform.isFxApplicationThread() ) {
+            this.refresh();
+        }
+        else {
+            Platform.runLater( () -> this.refresh() );
+        }
     }
 
     /**

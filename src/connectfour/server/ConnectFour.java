@@ -1,7 +1,7 @@
 package connectfour.server;
 
+import java.util.Set;
 import connectfour.ConnectFourException;
-import connectfour.server.ConnectFourGame;
 
 /**
  * A basic implementation of the Connect Four game.
@@ -11,6 +11,8 @@ public class ConnectFour {
     public final static int ROWS = 6;
     /** the number of columns */
     public final static int COLS = 7;
+    /** how big a line one needs to win */
+    public final static int WIN_LEN = 4;
 
     /**
      * Used to indicate a move that has been made on the board.
@@ -121,6 +123,50 @@ public class ConnectFour {
         }
     }
 
+    private class C_R {
+        public final int c, r;
+        public C_R( int c, int r ) { this.c = c; this.r = r; }
+        public C_R advance( int scale, C_R dir ) {
+            return new C_R( this.c + scale * dir.c, this.r + scale * dir.r );
+        }
+        public boolean inBounds() {
+            return
+                this.c >= 0 && this.c < COLS && this.r >= 0 && this.r < ROWS;
+        }
+        public Move contents() {
+            return ConnectFour.this.board[ this.c ][ this.r ];
+        }
+    }
+
+    private Set< C_R > DIRS = Set.of(
+            new C_R( -1, -1), new C_R( -1, 0), new C_R( -1, 1), new C_R( 0, -1),
+            new C_R( 0, 1), new C_R( 1, -1), new C_R( 1, 0), new C_R( 1, 1)
+    );
+
+    public boolean hasWonGame() {
+        for ( int c = 0; c < COLS; ++c ) {
+            for ( int r = 0; r < ROWS; ++r ) {
+                C_R start = new C_R( c, r );
+                Move here = start.contents();
+                if ( here == Move.NONE ) continue; // NONE can't win :-)
+                for ( C_R dir: DIRS ) {
+                    C_R end = start.advance( WIN_LEN-1, dir );
+                    if ( end.inBounds() ) {
+                        boolean goodOne = true;
+                        for ( int delta = 1; delta < WIN_LEN; ++delta ) {
+                            if ( start.advance( delta, dir ).contents() != here ) {
+                                goodOne = false;
+                                break;
+                            }
+                        }
+                        if ( goodOne )return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns true if the game is currently in a winning state. Can be used to
      * determine if the most recent move won the game (and therefore the player
@@ -128,7 +174,7 @@ public class ConnectFour {
      *
      * @return True if the game is in a winning state. False otherwise.
      */
-    public boolean hasWonGame() {
+    public boolean hasWonGame_old() {
         Move player = board[lastCol][lastRow];
 
           // check left horizontal

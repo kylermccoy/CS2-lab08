@@ -73,7 +73,11 @@ public class ConnectFourBoard {
     /** the observers of this model */
     private List<Observer<ConnectFourBoard>> observers;
 
-    /** the view calls this method to add themselves as an observer of the model */
+    /** 
+     * The view calls this method to add themselves as an observer of the model.
+     * 
+     * @param observer the observer
+     */
     public void addObserver(Observer<ConnectFourBoard> observer) {
         this.observers.add(observer);
     }
