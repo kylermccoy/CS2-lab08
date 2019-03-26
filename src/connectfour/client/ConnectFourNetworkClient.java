@@ -105,16 +105,18 @@ public class ConnectFourNetworkClient {
                 throw new ConnectFourException("Expected CONNECT from server");
             }
             ConnectFourNetworkClient.dPrint("Connected to server " + this.clientSocket);
-
-            // Run rest of client in separate thread.
-            // This threads stops on its own at the end of the game and
-            // does not need to rendezvous with other software components.
-            Thread netThread = new Thread( () -> this.run() );
-            netThread.start();
         }
         catch(IOException e) {
             throw new ConnectFourException(e);
         }
+    }
+
+    /**
+     * Called from the GUI when it is ready to start receiving messages
+     * from the server.
+     */
+    public void startListener() {
+        new Thread(() -> this.run()).start();
     }
 
     /**

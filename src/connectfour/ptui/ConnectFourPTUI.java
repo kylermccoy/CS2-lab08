@@ -42,6 +42,10 @@ public class ConnectFourPTUI extends ConsoleApplication implements Observer<Conn
 
             // create uninitialized board
             this.board = new ConnectFourBoard();
+
+            // add ourselves as an observer
+            this.board.addObserver(this);
+
             // create the network connection
             this.serverConn = new ConnectFourNetworkClient(host, port, this.board);
         }
@@ -117,8 +121,9 @@ public class ConnectFourPTUI extends ConsoleApplication implements Observer<Conn
         this.userIn = userIn;
         this.userOut = userOut;
 
-        // Connect UI to model. Can't do it sooner because streams not set up.
-        this.board.addObserver(this);
+        // Start the network client listener thread
+        this.serverConn.startListener();
+
         // Manually force a display of all board state, since it's too late
         // to trigger update().
         this.refresh(this.board);
