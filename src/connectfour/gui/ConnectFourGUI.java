@@ -33,7 +33,6 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
         }
     }
 
-
     /**
      * Construct the layout for the game.
      *
@@ -44,6 +43,8 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
         // TODO
 
         stage.show();
+
+        // TODO: call startListener() in ConnectFourNetworkClient here
     }
 
     /**
