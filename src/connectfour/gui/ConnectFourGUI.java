@@ -3,6 +3,7 @@ package connectfour.gui;
 import connectfour.client.ConnectFourBoard;
 import connectfour.client.Observer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 
 import java.util.List;
