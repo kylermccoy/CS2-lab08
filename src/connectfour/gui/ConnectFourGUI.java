@@ -1,10 +1,22 @@
 package connectfour.gui;
 
+import connectfour.ConnectFourException;
 import connectfour.client.ConnectFourBoard;
+import connectfour.client.ConnectFourNetworkClient;
 import connectfour.client.Observer;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage ;
 
 import java.util.List;
 
@@ -13,7 +25,7 @@ import java.util.List;
  *
  * @author James Heloitis @ RIT CS
  * @author Sean Strout @ RIT CS
- * @author YOUR NAME HERE
+ * @author Kyle McCoy
  */
 public class ConnectFourGUI extends Application implements Observer<ConnectFourBoard> {
 
@@ -28,9 +40,13 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
             int port = Integer.parseInt(args.get(1));
 
             // TODO
+            ConnectFourBoard game = new ConnectFourBoard() ;
+            ConnectFourNetworkClient client = new ConnectFourNetworkClient(host, port, game) ;
         } catch(NumberFormatException e) {
             System.err.println(e);
             throw new RuntimeException(e);
+        }   catch(ConnectFourException e) {
+            System.err.println(e) ;
         }
     }
 
@@ -42,6 +58,34 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
      */
     public void start( Stage stage ) throws Exception {
         // TODO
+        GridPane gridPane = new GridPane() ;
+        for(int col = 0; col < 7; col++){
+            for(int row = 0; row < 6; row++){
+                Button button = new Button() ;
+                button.setPrefSize(64, 64) ;
+                button.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("empty.png"))));
+                gridPane.add(button, col, row) ;
+            }
+        }
+        gridPane.setGridLinesVisible(true) ;
+        Label left = new Label("Left") ;
+        left.setStyle("-fx-font: " + 18 + " arial;") ;
+        Label middle = new Label("Middle") ;
+        middle.setStyle("-fx-font: " + 18 + " arial;") ;
+        Label right = new Label("Right") ;
+        right.setStyle("-fx-font: " + 18 + " arial;") ;
+        BorderPane borderPane = new BorderPane() ;
+        borderPane.setCenter(middle) ;
+        borderPane.setAlignment(middle, Pos.BOTTOM_CENTER) ;
+        borderPane.setPrefHeight(64);
+        borderPane.setLeft(left) ;
+        borderPane.setAlignment(left, Pos.BOTTOM_LEFT) ;
+        borderPane.setRight(right) ;
+        borderPane.setAlignment(right, Pos.BOTTOM_RIGHT) ;
+        VBox vbox = new VBox(gridPane, borderPane) ;
+        Scene scene = new Scene(vbox) ;
+        stage.setScene(scene) ;
+        stage.setTitle("Lab 8: Test") ;
 
         stage.show();
 
