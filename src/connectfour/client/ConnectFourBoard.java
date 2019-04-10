@@ -150,6 +150,7 @@ public class ConnectFourBoard {
      * @return the player (or {@link Move#NONE}) at the given location
      */
     public Move getContents(int row, int col) {
+        // fixed return statement
         return this.board[col][row];
     }
 
