@@ -12,12 +12,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage ;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +27,12 @@ import java.util.List;
  * @author Kyle McCoy
  */
 public class ConnectFourGUI extends Application implements Observer<ConnectFourBoard> {
+    private ConnectFourBoard game ;
+    private ConnectFourNetworkClient client ;
+    private Label left ;
+    private Label middle ;
+    private Label right ;
+    private List<Button> buttons ;
 
     @Override
     public void init() {
@@ -40,12 +45,13 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
             int port = Integer.parseInt(args.get(1));
 
             // TODO
-            ConnectFourBoard game = new ConnectFourBoard() ;
-            ConnectFourNetworkClient client = new ConnectFourNetworkClient(host, port, game) ;
+            this.game = new ConnectFourBoard() ;
+            this.client = new ConnectFourNetworkClient(host, port, this.game) ;
+            this.game.addObserver(this);
         } catch(NumberFormatException e) {
             System.err.println(e);
             throw new RuntimeException(e);
-        }   catch(ConnectFourException e) {
+        } catch(ConnectFourException e) {
             System.err.println(e) ;
         }
     }
@@ -58,21 +64,29 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
      */
     public void start( Stage stage ) throws Exception {
         // TODO
+        buttons = new ArrayList<>() ;
         GridPane gridPane = new GridPane() ;
-        for(int col = 0; col < 7; col++){
-            for(int row = 0; row < 6; row++){
+        for(int row = 0; row < 6; row++){
+            for(int col = 0; col < 7; col++){
+                int move = col ;
                 Button button = new Button() ;
                 button.setPrefSize(64, 64) ;
                 button.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("empty.png"))));
+                button.setOnAction( event -> {
+                    if(game.isValidMove(move) && game.isMyTurn()) {
+                        client.sendMove(move);
+                    }
+                });
+                buttons.add(button) ;
                 gridPane.add(button, col, row) ;
             }
         }
         gridPane.setGridLinesVisible(true) ;
-        Label left = new Label("Left") ;
+        left = new Label(game.getMovesLeft() + " Moves Left") ;
         left.setStyle("-fx-font: " + 18 + " arial;") ;
-        Label middle = new Label("Middle") ;
+        middle = new Label("*") ;
         middle.setStyle("-fx-font: " + 18 + " arial;") ;
-        Label right = new Label("Right") ;
+        right = new Label("STARTING GAME!") ;
         right.setStyle("-fx-font: " + 18 + " arial;") ;
         BorderPane borderPane = new BorderPane() ;
         borderPane.setCenter(middle) ;
@@ -85,11 +99,12 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
         VBox vbox = new VBox(gridPane, borderPane) ;
         Scene scene = new Scene(vbox) ;
         stage.setScene(scene) ;
-        stage.setTitle("Lab 8: Test") ;
+        stage.setTitle("Connect Four") ;
 
         stage.show();
 
         // TODO: call startListener() in ConnectFourNetworkClient here
+        client.startListener();
     }
 
     /**
@@ -98,6 +113,8 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
     @Override
     public void stop() {
         // TODO
+        this.game.close();
+        this.client.close();
     }
 
     /**
@@ -105,6 +122,50 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
      */
     private void refresh() {
         // TODO
+        int i = 0 ;
+        for(int row = 0; row < 6; row++){
+            for(int col = 0; col < 7; col++){
+                if(this.game.getContents(row,col) == ConnectFourBoard.Move.PLAYER_ONE){
+                    buttons.get(i).setGraphic(new ImageView(new Image(getClass().getResourceAsStream("p1black.png"))));
+                }else if(this.game.getContents(row,col) == ConnectFourBoard.Move.PLAYER_TWO){
+                    buttons.get(i).setGraphic(new ImageView(new Image(getClass().getResourceAsStream("p2red.png"))));
+                }
+                if(this.game.isMyTurn()){
+                    buttons.get(i).setDisable(false);
+                }else{
+                    buttons.get(i).setDisable(true);
+                }
+                i++ ;
+            }
+        }
+        left.setText(this.game.getMovesLeft() + " Moves Left");
+        if(this.game.isMyTurn()){
+            middle.setText("YOUR TURN!");
+        }else{
+            middle.setText("OPPONENT'S TURN!");
+        }
+        ConnectFourBoard.Status status = this.game.getStatus() ;
+        switch (status){
+            case TIE:
+                right.setText("TIE!");
+                middle.setText("*");
+                break;
+            case ERROR:
+                right.setText("ERROR!");
+                middle.setText("*");
+                break;
+            case I_WON:
+                right.setText("YOU WON!");
+                middle.setText("*");
+                break;
+            case I_LOST:
+                right.setText("YOU LOST!");
+                middle.setText("*");
+                break;
+            case NOT_OVER:
+                right.setText("NOT OVER!");
+                break;
+        }
     }
 
     /**
