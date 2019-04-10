@@ -27,11 +27,17 @@ import java.util.List;
  * @author Kyle McCoy
  */
 public class ConnectFourGUI extends Application implements Observer<ConnectFourBoard> {
+    // the model
     private ConnectFourBoard game ;
+    // the client
     private ConnectFourNetworkClient client ;
+    // left label
     private Label left ;
+    // middle label
     private Label middle ;
+    // right label
     private Label right ;
+    // list of buttons
     private List<Button> buttons ;
 
     @Override
