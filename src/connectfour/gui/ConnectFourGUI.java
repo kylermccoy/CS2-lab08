@@ -72,6 +72,7 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
         // TODO
         buttons = new ArrayList<>() ;
         GridPane gridPane = new GridPane() ;
+        // loop to insert buttons into gridpane
         for(int row = 0; row < 6; row++){
             for(int col = 0; col < 7; col++){
                 int move = col ;
@@ -128,6 +129,7 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
      */
     private void refresh() {
         // TODO
+        // loop through buttons and change image displayed, disable button if not the user's turn
         int i = 0 ;
         for(int row = 0; row < 6; row++){
             for(int col = 0; col < 7; col++){
@@ -144,12 +146,14 @@ public class ConnectFourGUI extends Application implements Observer<ConnectFourB
                 i++ ;
             }
         }
+        // display who's turn it is
         left.setText(this.game.getMovesLeft() + " Moves Left");
         if(this.game.isMyTurn()){
             middle.setText("YOUR TURN!");
         }else{
             middle.setText("OPPONENT'S TURN!");
         }
+        // display status of the game
         ConnectFourBoard.Status status = this.game.getStatus() ;
         switch (status){
             case TIE:
